@@ -76,111 +76,73 @@ function getTodayKey() {
   return `day_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
 }
 
-// 🌞 OPEN DAY
-function openDay() {
-  const todayKey = getTodayKey();
-  const archived = localStorage.getItem(todayKey + "_closed");
+// Preprosto dnevno odklepanje
+const hookText = [
+  "Danes se cikli ponavljajo ali je čas za nov začetek?",
+  "Čas je, da pretrgaš vzorec, ki te zadržuje.",
+  "Ponovitev preteklosti? Odkleni svoj dan."
+];
 
-  if (archived) {
-    hook.innerHTML = `
-      Dan je zaprt v arhivu.<br><br>
-      Prenesi si PDF ali si oglej zapiske.<br>
-      🔗 <a href="${generatePDFLink(todayKey)}" target="_blank">Prenesi PDF</a>
-    `;
-    return;
+const tzolkinEnergy = [
+  "Muluc (Voda) – čiščenje, reset, spuščanje",
+  "Oc (Pes) – zvestoba, vodstvo, povezava",
+  "Chuen (Opica) – igrivost, kreativnost, sprostitev"
+];
+
+const dailyContent = document.getElementById('dailyContent');
+const hook = document.getElementById('hook');
+const openPortal = document.getElementById('openPortal');
+const streakDisplay = document.getElementById('streak');
+
+function getTodayKey() {
+  const today = new Date();
+  return `portal13_${today.getFullYear()}_${today.getMonth()}_${today.getDate()}`;
+}
+
+function unlockDay() {
+  const todayKey = getTodayKey();
+  if(!localStorage.getItem(todayKey)) {
+    // Naključno sporočilo
+    const hookMessage = hookText[Math.floor(Math.random()*hookText.length)];
+    const energyMessage = tzolkinEnergy[Math.floor(Math.random()*tzolkinEnergy.length)];
+    hook.innerHTML = `<strong>${hookMessage}</strong><br>${energyMessage}<br><br>
+      <a href="https://www.blinkita.si" target="_blank">
+        Odkrij svoj ritual na Blinkita.si
+      </a>`;
+    localStorage.setItem(todayKey, "unlocked");
+
+    // Update streak
+    let streak = parseInt(localStorage.getItem('streak')) || 0;
+    streak++;
+    localStorage.setItem('streak', streak);
+    streakDisplay.innerText = `Tvoj streak: ${streak} dni zapored`;
   }
-
-  const todayData = getTzolkinDay();
-  tzolkinImage.src = tzolkinSignImages[todayData.signIndex];
-  tzolkinName.innerText = todayData.sign;
-  toneDisplay.innerText = "Ton " + todayData.tone;
-
-  hook.innerHTML = `
-    <strong>${todayData.sign} – Ton ${todayData.tone}</strong><br>
-    Danes lahko večkrat preverjaš svojo energijo.<br>
-    Zapiši, kar čutiš spodaj:
-    <textarea id="dailyNotes" placeholder="Tvoji zapiski..." style="width:100%;height:100px;"></textarea>
-    <button onclick="saveDailyNotes('${todayKey}')">Shrani zapiske</button>
-  `;
-
-  localStorage.setItem(todayKey, "opened");
 }
 
-function saveDailyNotes(dayKey) {
-  const notes = document.getElementById("dailyNotes").value;
-  localStorage.setItem(dayKey + "_notes", notes);
-  alert("Zapiski shranjeni!");
+openPortal.addEventListener('click', unlockDay);
+
+// Service Worker registration
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('service-worker.js')
+    .then(()=> console.log('Service Worker registered'))
+    .catch(err => console.log('SW registration failed:', err));
 }
 
-// ob zapiranju dneva
-function closeDay() {
-  const todayKey = getTodayKey();
-  localStorage.setItem(todayKey + "_closed", true);
-
-  eveningText.innerHTML = `
-    Danes spuščaš.<br>
-    Tvoji zapiski so shranjeni.<br>
-    🌿 Prižgi Palo Santo in počivaj.
-  `;
+// Push Notification (zjutraj in zvečer)
+function scheduleNotifications() {
+  if('Notification' in window && Notification.permission !== 'denied'){
+    Notification.requestPermission().then(permission => {
+      if(permission === 'granted'){
+        // Simplified scheduling (uporabnik mora imeti stran odprto)
+        setInterval(()=>{
+          new Notification("PORTAL 13 – TI SI ČAS", {
+            body: "Odpri svoj dan – čas je za reset.",
+            icon: "icon-192.png"
+          });
+        }, 24*60*60*1000); // enkrat dnevno
+      }
+    });
+  }
 }
 
-// generiraj link do PDF arhiva (placeholder)
-function generatePDFLink(dayKey) {
-  // kasneje lahko povežemo z realnim PDF generatorjem
-  return `https://www.blinkita.si/portal13/download/${dayKey}.pdf`;
-}
-
-ffunction getKinFromDate(date) {
-  const diffDays = Math.floor((date - anchorDate) / (1000 * 60 * 60 * 24));
-  const tone = ((anchorTone + diffDays - 1) % 13 + 1); // 1–13
-  const signIndex = (anchorSignIdx + diffDays - 1) % 20; // 0–19
-  return { tone, signIndex };
-}
-
-function calculatePersonalEnergy() {
-  const birthDate = new Date(document.getElementById("birthDate").value);
-  if (!birthDate || isNaN(birthDate)) return;
-
-  const birthKin = getKinFromDate(birthDate);
-  const today = getTzolkinDay();
-
-  // kombinacija tonov in znakov
-  const combinedTone = ((birthKin.tone + today.tone - 1) % 13) || 13;
-  const combinedSignIndex = (birthKin.signIndex + today.signIndex) % 20;
-
-  document.getElementById("personalResult").innerHTML = `
-    Tvoja energija danes:<br><br>
-    <strong>${tzolkinSigns[combinedSignIndex]} – Ton ${combinedTone}</strong><br><br>
-    To ni naključje.<br>
-    To je tvoje ogledalo danes.
-  `;
-}
-
-🔒 Globlja razlaga je zaklenjena.<br><br>
-
-To ni generičen tekst.<br>
-To je tvoje osebno vodstvo.<br><br>
-
-<button onclick="openBlinkita()">ODKLENI</button>
-`;
-
-function updateProgress() {
-  let progress = parseInt(localStorage.getItem("progress")) || 0;
-
-  progress++;
-  if (progress > 13) progress = 1;
-
-  localStorage.setItem("progress", progress);
-
-  const percent = (progress / 13) * 100;
-  document.getElementById("progressBar").style.width = percent + "%";
-}
-
-// EVENTS
-openDayBtn.addEventListener("click", openDay);
-closeDayBtn.addEventListener("click", closeDay);
-
-// SERVICE WORKER
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
+scheduleNotifications();

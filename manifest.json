@@ -1,18 +1,20 @@
-self.addEventListener("install", e => {
-  e.waitUntil(
-    caches.open("portal13").then(cache => {
-      return cache.addAll([
-        "/",
-        "/index.html",
-        "/styles.css",
-        "/app.js"
-      ]);
-    })
-  );
-});
-
-self.addEventListener("fetch", e => {
-  e.respondWith(
-    caches.match(e.request).then(response => response || fetch(e.request))
-  );
-});
+{
+  "name": "PORTAL 13 – TI SI ČAS",
+  "short_name": "PORTAL13",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffe6f0",
+  "theme_color": "#d6336c",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

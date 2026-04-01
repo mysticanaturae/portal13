@@ -1,58 +1,22 @@
 <!DOCTYPE html>
 <html lang="sl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Portal 13 – Blinkita Time</title>
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#2CC7B5">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PORTAL 13 – TI SI ČAS</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <h1>PORTAL 13 – BLINKITA TIME</h1>
-    <p>Stopi v svoj čas in energijo.</p>
-  </header>
+  <div class="container">
+    <h1>PORTAL 13 – TI SI ČAS</h1>
+    <div id="dailyContent">
+      <p id="hook">Pripravljamo tvoj dnevni vstop...</p>
+      <button id="openPortal">Odkleni Dan</button>
+    </div>
+    <p id="streak"></p>
+  </div>
 
-  <main>
-    <!-- 🔮 Tzolkin Display -->
-    <section id="tzolkinSection">
-      <img id="tzolkinImage" src="" alt="Tzolkin znak" />
-      <h2 id="tzolkinName"></h2>
-      <p id="toneDisplay"></p>
-      <button id="openDayBtn">Odpri Dan</button>
-      <button id="closeDayBtn">Zapri Dan</button>
-      <div id="hook"></div>
-    </section>
-
-    <!-- 👶 Personal Energy -->
-    <section id="personalSection">
-      <h3>Tvoja energija danes</h3>
-      <label>Vnesi rojstni datum:</label>
-      <input type="date" id="birthDate">
-      <button onclick="calculatePersonalEnergy()">Izračunaj</button>
-      <div id="personalResult"></div>
-    </section>
-
-    <!-- 📊 Progress Bar -->
-    <section id="progressSection">
-      <h3>Napredek skozi 13-dnevni cikel</h3>
-      <div id="progressContainer">
-        <div id="progressBar"></div>
-      </div>
-      <button onclick="updateProgress()">Posodobi napredek</button>
-    </section>
-
-    <!-- 🌙 Evening / Closing Notes -->
-    <section id="eveningSection">
-      <div id="eveningText"></div>
-    </section>
-  </main>
-
-  <footer>
-    <p>&copy; 2026 BLINKITA TIME – <a href="https://www.blinkita.si" target="_blank">www.blinkita.si</a></p>
-  </footer>
-
-  <script src="script.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
