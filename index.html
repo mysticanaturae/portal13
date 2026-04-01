@@ -1,22 +1,33 @@
 <!DOCTYPE html>
 <html lang="sl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PORTAL 13 – TI SI ČAS</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>PORTAL 13</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-  <div class="container">
-    <h1>PORTAL 13 – TI SI ČAS</h1>
-    <div id="dailyContent">
-      <p id="hook">Pripravljamo tvoj dnevni vstop...</p>
-      <button id="openPortal">Odkleni Dan</button>
-    </div>
-    <p id="streak"></p>
-  </div>
 
-  <script src="app.js"></script>
+<body>
+
+<div class="container">
+
+  <h1>PORTAL 13</h1>
+
+  <img id="tzolkinImage" class="breathing" />
+  <h2 id="tzolkinName"></h2>
+  <p id="tone"></p>
+
+  <div id="hook"></div>
+
+  <button id="openDay">ODPRI DAN</button>
+  <button id="closeDay">ZAPRI DAN</button>
+
+  <div id="eveningText"></div>
+  <div id="streak"></div>
+
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
