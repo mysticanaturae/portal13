@@ -1,7 +1,18 @@
-self.addEventListener('install', event => {
-  console.log("Service Worker installed");
+self.addEventListener("install", e => {
+  e.waitUntil(
+    caches.open("portal13").then(cache => {
+      return cache.addAll([
+        "/",
+        "/index.html",
+        "/styles.css",
+        "/app.js"
+      ]);
+    })
+  );
 });
 
-self.addEventListener('fetch', event => {
-  // lahko dodamo cache za offline delovanje
+self.addEventListener("fetch", e => {
+  e.respondWith(
+    caches.match(e.request).then(response => response || fetch(e.request))
+  );
 });
