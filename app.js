@@ -111,6 +111,8 @@ function openDay() {
   streak++;
   localStorage.setItem("streak", streak);
 
+  updateProgress();
+
   streakDisplay.innerHTML = `
   🔥 ${streak} dni v ritmu<br>
   Vračaš se k sebi.
@@ -129,6 +131,63 @@ function closeDay() {
 
   Ne nosi jutri tega, kar ni tvoje.
   `;
+}
+
+function openBlinkita() {
+  window.open("https://www.blinkita.si/category/portal-13-ti-si-%C4%8Das", "_blank");
+}
+
+function calculatePersonalEnergy() {
+  const birthDate = new Date(document.getElementById("birthDate").value);
+
+  if (!birthDate) return;
+
+  const birthKin = getKinFromDate(birthDate);
+  const today = getTzolkinDay();
+
+  const combinedTone = (birthKin.tone + today.tone) % 13 || 13;
+  const combinedSign = (birthKin.signIndex + today.signIndex) % 20;
+
+  document.getElementById("personalResult").innerHTML = `
+  Tvoja energija danes:<br><br>
+
+  <strong>${tzolkinSigns[combinedSign]} – Ton ${combinedTone}</strong><br><br>
+
+  To ni naključje.<br>
+  To je tvoje ogledalo danes.
+  `;
+}
+
+function getKinFromDate(date) {
+  const diffDays = Math.floor((date - anchorDate) / (1000 * 60 * 60 * 24));
+
+  const tone = ((anchorTone + diffDays) % 13 + 13) % 13 || 13;
+  const signIndex = (anchorSignIdx + diffDays) % 20;
+
+  return { tone, signIndex };
+}
+
+document.getElementById("personalResult").innerHTML += `
+<br><br>
+
+🔒 Globlja razlaga je zaklenjena.<br><br>
+
+To ni generičen tekst.<br>
+To je tvoje osebno vodstvo.<br><br>
+
+<button onclick="openBlinkita()">ODKLENI</button>
+`;
+
+function updateProgress() {
+  let progress = parseInt(localStorage.getItem("progress")) || 0;
+
+  progress++;
+  if (progress > 13) progress = 1;
+
+  localStorage.setItem("progress", progress);
+
+  const percent = (progress / 13) * 100;
+  document.getElementById("progressBar").style.width = percent + "%";
 }
 
 // EVENTS
