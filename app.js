@@ -79,96 +79,82 @@ function getTodayKey() {
 // 🌞 OPEN DAY
 function openDay() {
   const todayKey = getTodayKey();
+  const archived = localStorage.getItem(todayKey + "_closed");
 
-  if (localStorage.getItem(todayKey)) {
+  if (archived) {
     hook.innerHTML = `
-    Dan si že odprla.<br><br>
-    Ne išči več.<br>
-    Živi to, kar si že dobila.
+      Dan je zaprt v arhivu.<br><br>
+      Prenesi si PDF ali si oglej zapiske.<br>
+      🔗 <a href="${generatePDFLink(todayKey)}" target="_blank">Prenesi PDF</a>
     `;
     return;
   }
 
   const todayData = getTzolkinDay();
-
   tzolkinImage.src = tzolkinSignImages[todayData.signIndex];
   tzolkinName.innerText = todayData.sign;
   toneDisplay.innerText = "Ton " + todayData.tone;
 
   hook.innerHTML = `
-  Ti nisi izgubljena.<br><br>
-  Samo živiš izven ritma.<br><br>
-
-  <strong>${todayData.sign} – Ton ${todayData.tone}</strong><br><br>
-
-  Danes se ne popravljaš.<br>
-  Danes se spomniš, kdo si.
+    <strong>${todayData.sign} – Ton ${todayData.tone}</strong><br>
+    Danes lahko večkrat preverjaš svojo energijo.<br>
+    Zapiši, kar čutiš spodaj:
+    <textarea id="dailyNotes" placeholder="Tvoji zapiski..." style="width:100%;height:100px;"></textarea>
+    <button onclick="saveDailyNotes('${todayKey}')">Shrani zapiske</button>
   `;
 
   localStorage.setItem(todayKey, "opened");
-
-  let streak = parseInt(localStorage.getItem("streak")) || 0;
-  streak++;
-  localStorage.setItem("streak", streak);
-
-  updateProgress();
-
-  streakDisplay.innerHTML = `
-  🔥 ${streak} dni v ritmu<br>
-  Vračaš se k sebi.
-  `;
 }
 
-// 🌙 CLOSE DAY
+function saveDailyNotes(dayKey) {
+  const notes = document.getElementById("dailyNotes").value;
+  localStorage.setItem(dayKey + "_notes", notes);
+  alert("Zapiski shranjeni!");
+}
+
+// ob zapiranju dneva
 function closeDay() {
+  const todayKey = getTodayKey();
+  localStorage.setItem(todayKey + "_closed", true);
+
   eveningText.innerHTML = `
-  Danes ne rešuješ življenja.<br><br>
-
-  Danes spuščaš.<br><br>
-
-  🌿 Prižgi Palo Santo.<br>
-  Zapri oči.<br><br>
-
-  Ne nosi jutri tega, kar ni tvoje.
+    Danes spuščaš.<br>
+    Tvoji zapiski so shranjeni.<br>
+    🌿 Prižgi Palo Santo in počivaj.
   `;
 }
 
-function openBlinkita() {
-  window.open("https://www.blinkita.si/category/portal-13-ti-si-%C4%8Das", "_blank");
+// generiraj link do PDF arhiva (placeholder)
+function generatePDFLink(dayKey) {
+  // kasneje lahko povežemo z realnim PDF generatorjem
+  return `https://www.blinkita.si/portal13/download/${dayKey}.pdf`;
+}
+
+ffunction getKinFromDate(date) {
+  const diffDays = Math.floor((date - anchorDate) / (1000 * 60 * 60 * 24));
+  const tone = ((anchorTone + diffDays - 1) % 13 + 1); // 1–13
+  const signIndex = (anchorSignIdx + diffDays - 1) % 20; // 0–19
+  return { tone, signIndex };
 }
 
 function calculatePersonalEnergy() {
   const birthDate = new Date(document.getElementById("birthDate").value);
-
-  if (!birthDate) return;
+  if (!birthDate || isNaN(birthDate)) return;
 
   const birthKin = getKinFromDate(birthDate);
   const today = getTzolkinDay();
 
-  const combinedTone = (birthKin.tone + today.tone) % 13 || 13;
-  const combinedSign = (birthKin.signIndex + today.signIndex) % 20;
+  // kombinacija tonov in znakov
+  const combinedTone = ((birthKin.tone + today.tone - 1) % 13) || 13;
+  const combinedSignIndex = (birthKin.signIndex + today.signIndex) % 20;
 
   document.getElementById("personalResult").innerHTML = `
-  Tvoja energija danes:<br><br>
-
-  <strong>${tzolkinSigns[combinedSign]} – Ton ${combinedTone}</strong><br><br>
-
-  To ni naključje.<br>
-  To je tvoje ogledalo danes.
+    Tvoja energija danes:<br><br>
+    <strong>${tzolkinSigns[combinedSignIndex]} – Ton ${combinedTone}</strong><br><br>
+    To ni naključje.<br>
+    To je tvoje ogledalo danes.
   `;
 }
-
-function getKinFromDate(date) {
-  const diffDays = Math.floor((date - anchorDate) / (1000 * 60 * 60 * 24));
-
-  const tone = ((anchorTone + diffDays) % 13 + 13) % 13 || 13;
-  const signIndex = (anchorSignIdx + diffDays) % 20;
-
-  return { tone, signIndex };
-}
-
-document.getElementById("personalResult").innerHTML += `
-<br><br>
 
 🔒 Globlja razlaga je zaklenjena.<br><br>
 

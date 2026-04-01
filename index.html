@@ -3,177 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>PORTAL 13 – BLINKITA TIME</title>
+<title>Portal 13 – Blinkita Time</title>
+<link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#d6336c">
-<style>
-  body { font-family: sans-serif; background: #f8f5f2; color: #222; margin:0; padding:0; display:flex; flex-direction:column; min-height:100vh;}
-  header, footer { background:#d6336c; color:white; text-align:center; padding:15px 0;}
-  main { flex:1; padding:20px; text-align:center;}
-  button { margin:10px; padding:10px 20px; border:none; border-radius:8px; background:#f0a500; color:white; font-size:16px; cursor:pointer;}
-  button:hover { background:#f39c12;}
-  #tzolkinImage { width:120px; height:120px; margin:15px 0;}
-  #streakBarContainer { width: 80%; background: #ddd; border-radius: 10px; margin: 20px auto; height: 20px; }
-  #streakBar { width: 0%; height: 100%; background:#d6336c; border-radius:10px; transition: width 0.3s; }
-  #eveningText { margin-top:20px; font-style:italic; color:#555;}
-  #proModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); justify-content:center; align-items:center; }
-  #proModalContent { background:white; padding:20px; border-radius:10px; text-align:left; width:90%; max-width:400px;}
-  #proModal input { width:100%; padding:8px; margin:5px 0; border-radius:5px; border:1px solid #ccc;}
-</style>
+<meta name="theme-color" content="#2CC7B5">
 </head>
 <body>
+  <header>
+    <h1>PORTAL 13 – BLINKITA TIME</h1>
+    <p>Stopi v svoj čas in energijo.</p>
+  </header>
 
-<header>
-  <h1>PORTAL 13 – BLINKITA TIME</h1>
-  <p>Odkrij svojo dnevno energijo in resetiraj svoj čas</p>
-</header>
+  <main>
+    <!-- 🔮 Tzolkin Display -->
+    <section id="tzolkinSection">
+      <img id="tzolkinImage" src="" alt="Tzolkin znak" />
+      <h2 id="tzolkinName"></h2>
+      <p id="toneDisplay"></p>
+      <button id="openDayBtn">Odpri Dan</button>
+      <button id="closeDayBtn">Zapri Dan</button>
+      <div id="hook"></div>
+    </section>
 
-<main>
-  <img id="tzolkinImage" src="" alt="Tzolkin znak">
-  <h2 id="tzolkinName"></h2>
-  <p id="tone"></p>
-  <div id="hook"></div>
+    <!-- 👶 Personal Energy -->
+    <section id="personalSection">
+      <h3>Tvoja energija danes</h3>
+      <label>Vnesi rojstni datum:</label>
+      <input type="date" id="birthDate">
+      <button onclick="calculatePersonalEnergy()">Izračunaj</button>
+      <div id="personalResult"></div>
+    </section>
 
-  <div>
-    <button id="openDay">Odpri dan</button>
-    <button id="closeDay">Zapri dan</button>
-    <button id="blinkitaBtn">BLINKITA</button>
-  </div>
+    <!-- 📊 Progress Bar -->
+    <section id="progressSection">
+      <h3>Napredek skozi 13-dnevni cikel</h3>
+      <div id="progressContainer">
+        <div id="progressBar"></div>
+      </div>
+      <button onclick="updateProgress()">Posodobi napredek</button>
+    </section>
 
-  <div id="streakBarContainer">
-    <div id="streakBar"></div>
-  </div>
-  <div id="streakDisplay"></div>
+    <!-- 🌙 Evening / Closing Notes -->
+    <section id="eveningSection">
+      <div id="eveningText"></div>
+    </section>
+  </main>
 
-  <p id="eveningText"></p>
-</main>
+  <footer>
+    <p>&copy; 2026 BLINKITA TIME – <a href="https://www.blinkita.si" target="_blank">www.blinkita.si</a></p>
+  </footer>
 
-<footer>
-  BLINKITA TIME – PORTAL 13 | Premium unikatna e-knjiga in osebna energija
-</footer>
-
-<!-- PREMIUM MODAL -->
-<div id="proModal">
-  <div id="proModalContent">
-    <h3>Odkleni Premium</h3>
-    <p>Vnesi svoj email in rojstni datum, da dobiš unikatno e-knjigo</p>
-    <input type="email" id="proEmail" placeholder="Email">
-    <input type="date" id="partner1Dob" placeholder="Rojstni datum">
-    <button id="proButtonSubmit">Pošlji</button>
-    <button id="closeModal">Zapri</button>
-  </div>
-</div>
-
-<script>
-  // --------------------------
-  // 🔮 TZOLKIN PODATKI
-  // --------------------------
-  const tzolkinNumbers = ["1","2","3","4","5","6","7","8","9","10","11","12","13"];
-  const tzolkinSigns = ["Krokodil", "Veter", "Zora", "Kuščar", "Kača", "Smrt", "Jelen", "Zajec", "Voda", "Pes", "Opica", "Cesta", "Trsje", "Jaguar", "Orel","Sova","Zemlja","Ogledalo","Nevihta","Sonce"];
-  const tzolkinNumberImages = [
-    /* tukaj vstavi svoje linke slik 1-13 */
-  ];
-  const tzolkinSignImages = [
-    /* tukaj vstavi svoje linke slik 20 znakov */
-  ];
-
-  // --------------------------
-  // 🧠 ELEMENTI
-  // --------------------------
-  const hook = document.getElementById("hook");
-  const openDayBtn = document.getElementById("openDay");
-  const closeDayBtn = document.getElementById("closeDay");
-  const blinkitaBtn = document.getElementById("blinkitaBtn");
-  const eveningText = document.getElementById("eveningText");
-  const tzolkinImage = document.getElementById("tzolkinImage");
-  const tzolkinName = document.getElementById("tzolkinName");
-  const toneDisplay = document.getElementById("tone");
-  const streakBar = document.getElementById("streakBar");
-  const streakDisplay = document.getElementById("streakDisplay");
-
-  // --------------------------
-  // DAN KEY
-  // --------------------------
-  function getTodayKey() {
-    const d = new Date();
-    return `day_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
-  }
-
-  function getTone() { return (new Date().getDate() % 13) + 1; }
-  function getTodaySign() { return tzolkinSigns[new Date().getDate() % tzolkinSigns.length]; }
-
-  // --------------------------
-  // OPEN DAY
-  // --------------------------
-  function openDay() {
-    const todayKey = getTodayKey();
-    if (!localStorage.getItem(todayKey)) {
-      const signIdx = new Date().getDate() % tzolkinSigns.length;
-      const sign = tzolkinSigns[signIdx];
-      const tone = getTone();
-
-      tzolkinImage.src = tzolkinSignImages[signIdx] || "";
-      tzolkinName.innerText = sign;
-      toneDisplay.innerText = "Ton " + tone;
-      hook.innerHTML = `<strong>${sign} – Ton ${tone}</strong><br>Danes je tvoj reset.`;
-
-      localStorage.setItem(todayKey, "opened");
-
-      // streak + progress bar
-      let streak = parseInt(localStorage.getItem("streak")) || 0;
-      streak++;
-      if(streak>13) streak=1; // reset po 13 dneh
-      localStorage.setItem("streak", streak);
-      streakDisplay.innerText = `🔥 ${streak} dni zapored`;
-      streakBar.style.width = (streak/13*100) + "%";
-    }
-  }
-
-  // --------------------------
-  // CLOSE DAY
-  // --------------------------
-  function closeDay() {
-    eveningText.innerHTML = `
-      Danes ne rešuješ življenja.<br>
-      Danes spuščaš.<br>
-      🌿 Prižgi Palo Santo in zapri oči 60 sekund.
-    `;
-  }
-
-  // --------------------------
-  // BLINKITA LINK
-  // --------------------------
-  function openShop() {
-    window.open("https://blinkita.si/shop/portal13", "_blank");
-  }
-
-  // --------------------------
-  // EVENTS
-  // --------------------------
-  openDayBtn.addEventListener("click", openDay);
-  closeDayBtn.addEventListener("click", closeDay);
-  blinkitaBtn.addEventListener("click", openShop);
-
-  // --------------------------
-  // PREMIUM MODAL
-  // --------------------------
-  const proModal = document.getElementById('proModal');
-  document.getElementById('proButtonSubmit').addEventListener('click', ()=>{
-    const email = document.getElementById('proEmail').value;
-    const dob = document.getElementById('partner1Dob').value;
-    // tukaj lahko dodamo API call za generiranje PDF e-knjige
-    alert("Premium aktiviran! Email: "+email+" | Rojstni datum: "+dob);
-    proModal.style.display = 'none';
-  });
-  document.getElementById('closeModal').addEventListener('click', ()=>proModal.style.display='none');
-  // optional: click outside modal
-  window.addEventListener('click',(e)=>{if(e.target===proModal) proModal.style.display='none';});
-
-  // --------------------------
-  // SERVICE WORKER (PWA)
-  // --------------------------
-  if ('serviceWorker' in navigator) { navigator.serviceWorker.register('service-worker.js'); }
-
-</script>
+  <script src="script.js"></script>
 </body>
 </html>
