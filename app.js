@@ -27,9 +27,22 @@ function getTone() {
   return (new Date().getDate() % 13) + 1;
 }
 
-// 🔮 IZBIRA ZNAKA
-function getTodaySign() {
-  return tzolkinSigns[new Date().getDate() % tzolkinSigns.length];
+const anchorDate = new Date("1800-01-01");
+const anchorTone = 10;
+const anchorSignIdx = 13; // Jaguar (če začneš od 0)
+
+function getTzolkinDay() {
+  const today = new Date();
+  const diffDays = Math.floor((today - anchorDate) / (1000 * 60 * 60 * 24));
+
+  const tone = ((anchorTone + diffDays) % 13 + 13) % 13 || 13;
+  const signIndex = (anchorSignIdx + diffDays) % 20;
+
+  return {
+    tone: tone,
+    sign: tzolkinSigns[signIndex],
+    signIndex: signIndex
+  };
 }
 
 // 🧠 ELEMENTI
@@ -51,22 +64,22 @@ function getTodayKey() {
 
 // 🌞 ODPRE DAN
 function openDay() {
-  const todayKey = getTodayKey();
+ const todayData = getTzolkinDay();
 
-  if (!localStorage.getItem(todayKey)) {
-    const sign = getTodaySign();
-    const tone = getTone();
-
-    tzolkinImage.src = sign.img;
-    tzolkinName.innerText = sign.name;
-    toneDisplay.innerText = "Ton " + tone;
+tzolkinImage.src = tzolkinSignImages[todayData.signIndex];
+tzolkinName.innerText = todayData.sign;
+toneDisplay.innerText = "Ton " + todayData.tone;
 
     hook.innerHTML = `
-      Danes ni problem v tebi.<br><br>
-      Problem je, da živiš v napačnem ritmu.<br><br>
-      <strong>${sign.name} – Ton ${tone}</strong><br><br>
-      Danes je tvoj reset.
-    `;
+Ti nisi izgubljena.<br><br>
+
+Samo živiš izven svojega ritma.<br><br>
+
+<strong>${todayData.sign} – Ton ${todayData.tone}</strong><br><br>
+
+Danes se ne popravljaš.<br>
+Danes se spomniš, kdo si.
+`;
 
     localStorage.setItem(todayKey, "opened");
 
@@ -89,9 +102,15 @@ function closeDay() {
   `;
 }
 
+streakDisplay.innerText = `
+🔥 ${streak} dni v ritmu<br>
+Ne vračaš se sem.<br>
+Vračaš se k sebi.
+`;
+
 // 🛍️ SHOP
 function openShop() {
-  window.open("https://blinkita.si/shop/portal13", "_blank");
+  window.open("https://www.blinkita.si/category/portal-13-ti-si-%C4%8Das", "_blank");
 }
 
 // EVENTS
