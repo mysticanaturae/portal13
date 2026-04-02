@@ -63,34 +63,82 @@ function getTzolkinDay() {
   return { tone, signIndex, sign: tzolkinSigns[signIndex] };
 }
 
-// 🌞 OPEN DAY
-function openDay() {
+// --------------------------
+// OPEN DAY z daily streak in OpenAI sporočili
+// --------------------------
+async function openDay() {
   const todayKey = getTodayKey();
-  const archived = localStorage.getItem(todayKey + "_closed");
+  const signIdx = new Date().getDate() % tzolkinSigns.length;
+  const sign = tzolkinSigns[signIdx];
+  const tone = getTone();
 
-  if (archived) {
-    hook.innerHTML = `
-      Dan je zaprt v arhivu.<br><br>
-      🔗 <a href="${generatePDFLink(todayKey)}" target="_blank">Prenesi PDF</a>
-    `;
-    return;
+  // Prikažemo slike in tekst
+  tzolkinImage.src = tzolkinSignImages[signIdx] || "";
+  tzolkinName.innerText = sign;
+  toneDisplay.innerText = "Ton " + tone;
+  hook.innerHTML = `<strong>${sign} – Ton ${tone}</strong><br>Danes je tvoj reset.`;
+
+  // --------------------------
+  // STREAK – šteje 1x na dan
+  // --------------------------
+  const lastOpened = localStorage.getItem(todayKey + "_streakCounted");
+  let streak = parseInt(localStorage.getItem("streak")) || 0;
+
+  if (!lastOpened) {
+    streak++;
+    if(streak > 13) streak = 1; // reset po 13 dneh
+    localStorage.setItem("streak", streak);
+    localStorage.setItem(todayKey + "_streakCounted", "true");
   }
 
-  const todayData = getTzolkinDay();
-  tzolkinImage.src = tzolkinSignImages[todayData.signIndex];
-  tzolkinName.innerText = todayData.sign;
-  toneDisplay.innerText = "Ton " + todayData.tone;
+  streakDisplay.innerText = `🔥 ${streak} dni zapored`;
+  streakBar.style.width = (streak / 13 * 100) + "%";
 
-  hook.innerHTML = `
-    <strong>${todayData.sign} – Ton ${todayData.tone}</strong><br>
-    Danes lahko večkrat preverjaš svojo energijo.<br><br>
-    Zapiši svoje občutke:<br>
-    <textarea id="dailyNotes" placeholder="Tvoji zapiski..." style="width:100%;height:100px;"></textarea>
-    <button onclick="saveDailyNotes('${todayKey}')">Shrani zapiske</button>
-  `;
-
-  localStorage.setItem(todayKey, "opened");
+  // --------------------------
+  // OpenAI sporočila
+  // --------------------------
+  // ločimo free in premium
+  const isPremium = localStorage.getItem("premiumActive") === "true";
+  const message = await getDailyMessage(sign, tone, isPremium);
+  const messageContainer = document.getElementById("dailyMessage");
+  if(messageContainer){
+    messageContainer.innerHTML = message;
+  } else {
+    const p = document.createElement("p");
+    p.id = "dailyMessage";
+    p.style.marginTop = "20px";
+    p.innerHTML = message;
+    hook.appendChild(p);
+  }
 }
+
+// --------------------------
+// FUNKCIJA ZA GENERIRANJE SPOROČILA PREKO OPENAI
+// --------------------------
+async function getDailyMessage(sign, tone, isPremium){
+  // to bo kasneje API call ali lokalni prompt
+  if(isPremium){
+    return `<em>Premium sporočilo:</em> Energija dneva (${sign} – Ton ${tone}) te vodi v globoko transformacijo.`;
+  } else {
+    return `<em>Free sporočilo:</em> Danes opazuj energijo (${sign} – Ton ${tone}) in prisluhni svoji notranji resnici.`;
+  }
+}
+
+// --------------------------
+// PREMIUM MODAL submit
+// --------------------------
+document.getElementById('proButtonSubmit').addEventListener('click', ()=>{
+  const email = document.getElementById('proEmail').value;
+  const dob = document.getElementById('partner1Dob').value;
+
+  if(email && dob){
+    localStorage.setItem("premiumActive", "true"); // shrani premium status
+    alert("Premium aktiviran! Email: "+email+" | Rojstni datum: "+dob);
+    proModal.style.display = 'none';
+  } else {
+    alert("Prosimo, izpolnite oba podatka.");
+  }
+});
 
 // 🌙 CLOSE DAY
 function closeDay() {
