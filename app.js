@@ -1,3 +1,7 @@
+// 🔮 TZOLKIN DATA
+const tzolkinSigns = ["Krokodil", "Veter", "Zora", "Kuščar", "Kača", "Smrt", "Jelen", "Zajec", "Voda", "Pes", "Opica", "Cesta", "Trsje", "Jaguar", "Orel","Sova","Zemlja","Ogledalo","Nevihta","Sonce"];
+
+
 // 🔮 TZOLKIN PODATKI (tukaj samo zamenjaš slike)
 const tzolkinSigns = [
   { name: "Imix", img: "images/imix.png" },
@@ -27,10 +31,12 @@ function getTone() {
   return (new Date().getDate() % 13) + 1;
 }
 
+// 🧭 anchor (PRAVI TZOLKIN)
 const anchorDate = new Date("1800-01-01");
 const anchorTone = 10;
-const anchorSignIdx = 13; // Jaguar (če začneš od 0)
+const anchorSignIdx = 13;
 
+// 🔮 CALC
 function getTzolkinDay() {
   const today = new Date();
   const diffDays = Math.floor((today - anchorDate) / (1000 * 60 * 60 * 24));
@@ -39,9 +45,9 @@ function getTzolkinDay() {
   const signIndex = (anchorSignIdx + diffDays) % 20;
 
   return {
-    tone: tone,
+    tone,
     sign: tzolkinSigns[signIndex],
-    signIndex: signIndex
+    signIndex
   };
 }
 
@@ -56,61 +62,65 @@ const tzolkinImage = document.getElementById("tzolkinImage");
 const tzolkinName = document.getElementById("tzolkinName");
 const toneDisplay = document.getElementById("tone");
 
-// 🔑 DAN KEY
+// 🔑 KEY
 function getTodayKey() {
   const d = new Date();
   return `day_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
 }
 
-// 🌞 ODPRE DAN
+// 🌞 OPEN DAY
 function openDay() {
- const todayData = getTzolkinDay();
+  const todayKey = getTodayKey();
 
-tzolkinImage.src = tzolkinSignImages[todayData.signIndex];
-tzolkinName.innerText = todayData.sign;
-toneDisplay.innerText = "Ton " + todayData.tone;
-
+  if (localStorage.getItem(todayKey)) {
     hook.innerHTML = `
-Ti nisi izgubljena.<br><br>
-
-Samo živiš izven svojega ritma.<br><br>
-
-<strong>${todayData.sign} – Ton ${todayData.tone}</strong><br><br>
-
-Danes se ne popravljaš.<br>
-Danes se spomniš, kdo si.
-`;
-
-    localStorage.setItem(todayKey, "opened");
-
-    // streak
-    let streak = parseInt(localStorage.getItem("streak")) || 0;
-    streak++;
-    localStorage.setItem("streak", streak);
-    streakDisplay.innerText = "🔥 " + streak + " dni zapored";
+    Dan si že odprla.<br><br>
+    Ne išči več.<br>
+    Živi to, kar si že dobila.
+    `;
+    return;
   }
-}
 
-// 🌙 ZAPRI DAN
-function closeDay() {
-  eveningText.innerHTML = `
-    Danes ne rešuješ življenja.<br><br>
-    Danes spuščaš.<br><br>
-    🌿 Prižgi Palo Santo.<br>
-    Zapri oči za 60 sekund.<br>
-    Spusti vse, kar ni tvoje.
+  const todayData = getTzolkinDay();
+
+  tzolkinImage.src = tzolkinSignImages[todayData.signIndex];
+  tzolkinName.innerText = todayData.sign;
+  toneDisplay.innerText = "Ton " + todayData.tone;
+
+  hook.innerHTML = `
+  Ti nisi izgubljena.<br><br>
+  Samo živiš izven ritma.<br><br>
+
+  <strong>${todayData.sign} – Ton ${todayData.tone}</strong><br><br>
+
+  Danes se ne popravljaš.<br>
+  Danes se spomniš, kdo si.
+  `;
+
+  localStorage.setItem(todayKey, "opened");
+
+  let streak = parseInt(localStorage.getItem("streak")) || 0;
+  streak++;
+  localStorage.setItem("streak", streak);
+
+  streakDisplay.innerHTML = `
+  🔥 ${streak} dni v ritmu<br>
+  Vračaš se k sebi.
   `;
 }
 
-streakDisplay.innerText = `
-🔥 ${streak} dni v ritmu<br>
-Ne vračaš se sem.<br>
-Vračaš se k sebi.
-`;
+// 🌙 CLOSE DAY
+function closeDay() {
+  eveningText.innerHTML = `
+  Danes ne rešuješ življenja.<br><br>
 
-// 🛍️ SHOP
-function openShop() {
-  window.open("https://www.blinkita.si/category/portal-13-ti-si-%C4%8Das", "_blank");
+  Danes spuščaš.<br><br>
+
+  🌿 Prižgi Palo Santo.<br>
+  Zapri oči.<br><br>
+
+  Ne nosi jutri tega, kar ni tvoje.
+  `;
 }
 
 // EVENTS
@@ -120,4 +130,3 @@ closeDayBtn.addEventListener("click", closeDay);
 // SERVICE WORKER
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
-}

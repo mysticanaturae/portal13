@@ -1,42 +1,33 @@
 <!DOCTYPE html>
 <html lang="sl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PORTAL 13 – TI SI ČAS</title>
-
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>PORTAL 13</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-  <div class="container">
 
-    <h1>PORTAL 13</h1>
-    <h2>TI SI ČAS</h2>
+<div class="container">
 
-    <div id="tzolkinBox">
-      <h3 id="tone"></h3>
-      <img id="tzolkinImage" src="" alt="Tzolkin znak">
-      <p id="tzolkinName"></p>
-    </div>
+  <h1>PORTAL 13</h1>
 
-    <div id="dailyContent">
-      <p id="hook">Pripravljamo tvoj dan...</p>
-      <button id="openDay">🌞 ODPREJ DAN</button>
-    </div>
+  <img id="tzolkinImage" class="breathing" />
+  <h2 id="tzolkinName"></h2>
+  <p id="tone"></p>
 
-    <div id="eveningBox">
-      <button id="closeDay">🌙 ZAPRI DAN</button>
-      <p id="eveningText"></p>
-    </div>
+  <div id="hook"></div>
 
-    <p id="streak"></p>
+  <button id="openDay">ODPRI DAN</button>
+  <button id="closeDay">ZAPRI DAN</button>
 
-    <button onclick="openShop()">✨ ODKRIJ SVOJO KODO</button>
+  <div id="eveningText"></div>
+  <div id="streak"></div>
 
-  </div>
+</div>
 
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
