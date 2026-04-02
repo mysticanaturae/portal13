@@ -63,36 +63,45 @@ function getTzolkinDay() {
   return { tone, signIndex, sign: tzolkinSigns[signIndex] };
 }
 
-// --------------------------
-// OPEN DAY z daily streak in OpenAI sporočili
-// --------------------------
 async function openDay() {
   const todayKey = getTodayKey();
-  const signIdx = new Date().getDate() % tzolkinSigns.length;
-  const sign = tzolkinSigns[signIdx];
-  const tone = getTone();
+  const { tone, signIndex, sign } = getTzolkinDay(); // pravi izračun
 
-  // Prikažemo slike in tekst
-  tzolkinImage.src = tzolkinSignImages[signIdx] || "";
+  tzolkinImage.src = tzolkinSignImages[signIndex] || "";
   tzolkinName.innerText = sign;
   toneDisplay.innerText = "Ton " + tone;
-  hook.innerHTML = `<strong>${sign} – Ton ${tone}</strong><br>Danes je tvoj reset.`;
 
-  // --------------------------
-  // STREAK – šteje 1x na dan
-  // --------------------------
+  const today = new Date();
+  hook.innerHTML = `<strong>${today.toLocaleDateString()} – ${sign} – Ton ${tone}</strong><br>Danes je tvoj reset.`;
+
+  // STREAK
   const lastOpened = localStorage.getItem(todayKey + "_streakCounted");
   let streak = parseInt(localStorage.getItem("streak")) || 0;
 
   if (!lastOpened) {
     streak++;
-    if(streak > 13) streak = 1; // reset po 13 dneh
+    if(streak > 13) streak = 1;
     localStorage.setItem("streak", streak);
     localStorage.setItem(todayKey + "_streakCounted", "true");
   }
 
   streakDisplay.innerText = `🔥 ${streak} dni zapored`;
   streakBar.style.width = (streak / 13 * 100) + "%";
+
+  // DAILY MESSAGE
+  const isPremium = localStorage.getItem("premiumActive") === "true";
+  const message = await getDailyMessage(sign, tone, isPremium);
+  const messageContainer = document.getElementById("dailyMessage");
+  if(messageContainer){
+    messageContainer.innerHTML = message;
+  } else {
+    const p = document.createElement("p");
+    p.id = "dailyMessage";
+    p.style.marginTop = "20px";
+    p.innerHTML = message;
+    hook.appendChild(p);
+  }
+}
 
   // --------------------------
   // OpenAI sporočila
@@ -215,6 +224,7 @@ function getTodayKey() {
 // EVENTS
 openDayBtn.addEventListener("click", openDay);
 closeDayBtn.addEventListener("click", closeDay);
+blinkitaBtn.addEventListener("click", openBlinkita);
 
 // SERVICE WORKER
 if ("serviceWorker" in navigator) {
